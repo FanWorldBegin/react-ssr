@@ -18,7 +18,7 @@ module.exports = {
     //publicPath='/public  ---- /public/app.hash.js
     //帮我们区分url为静态资源还是url 请求，添加前缀
     //当静态资源要部署在CDN上面时候，将CDN的域名写入publicPath 即可
-    publicPath: '',
+    publicPath: '/public',
   },
   //配置loader
   module: {
@@ -36,14 +36,16 @@ module.exports = {
         test: /\.(js)$/,
         use: {
           loader: 'babel-loader',
-          exclude: [
-            path.join(__dirname, '../node_modules')
-          ]
-        }
+        },
+        exclude: [
+          path.join(__dirname, '../node_modules')
+        ]
       }
     ]
   },
   plugins: [
-    new HTMLPlugin()
+    new HTMLPlugin({
+      template: path.join(__dirname, '../client/template.html')
+    })
   ]
 }
