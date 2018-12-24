@@ -6,6 +6,7 @@ module.exports = {
   //说明webpack打包出来的内容使用在哪个环境里面
   //web(浏览器) node(nodejs)
   target: 'node',
+  mode: 'development',
   //app.js为打包入口，形成依赖🌲
   entry: {
     app: path.join(__dirname, '../client/server.entry.js')
@@ -18,7 +19,7 @@ module.exports = {
     //打包出的js使用的模块方案，amd cmd ...
     //使用最新的commonjs的模块加载方案
     libraryTarget: 'commonjs2',
-    publicPath: '/public',
+    publicPath: '/public/',
   },
   //配置loader
   module: {
