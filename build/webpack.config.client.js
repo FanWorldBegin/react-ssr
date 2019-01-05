@@ -1,46 +1,56 @@
 const webpack = require('webpack')
-//使用绝对路径path,避免系统差异
+// 使用绝对路径path,避免系统差异
 const path = require('path')
 const HTMLPlugin = require('html-webpack-plugin')
-//判断当前环境， 在启动命令中手动输入，在启动webpack时候手动输入指令区分开发环境，线上环境
+// 判断当前环境， 在启动命令中手动输入，在启动webpack时候手动输入指令区分开发环境，线上环境
 const isDev = process.env.NODE_ENV == 'development'
 console.log(process.env.NODE_ENV)
-const config  = {
+const config = {
   mode: 'development',
-  //app.js为打包入口，形成依赖🌲
+  // app.js为打包入口，形成依赖🌲
   entry: {
     app: path.join(__dirname, '../client/app.js')
   },
-  //打包后输出的地方
+  // 打包后输出的地方
   output: {
-    //[] 中括号是变量的意思，filename中的变量有 
+    // [] 中括号是变量的意思，filename中的变量有
     // name 代表 entry下面对应的一项的名字，这里为 app
-    //hash 在对整个app打包完成后，会根据内容生成hash值，只要内容不一样会变化
+    // hash 在对整个app打包完成后，会根据内容生成hash值，只要内容不一样会变化
     filename: '[name].[hash].js',
-    //path 输出文件存放路径, 根目录下 dist 文件夹
+    // path 输出文件存放路径, 根目录下 dist 文件夹
     path: path.join(__dirname, '../dist'),
-    //静态资源引用路径，publicPath为空时： 在html 中打包后生成的script 路径为 app.hash.js
-    //publicPath='/public  ---- /public/app.hash.js
-    //帮我们区分url为静态资源还是url 请求，添加前缀
-    //当静态资源要部署在CDN上面时候，将CDN的域名写入publicPath 即可
-    publicPath: '/public/',
+    // 静态资源引用路径，publicPath为空时： 在html 中打包后生成的script 路径为 app.hash.js
+    // publicPath='/public  ---- /public/app.hash.js
+    // 帮我们区分url为静态资源还是url 请求，添加前缀
+    // 当静态资源要部署在CDN上面时候，将CDN的域名写入publicPath 即可
+    publicPath: '/public/'
   },
-  //配置loader
+  // 配置loader
   module: {
     rules: [
+      {
+        // 在执行真正的loader代码编译之前，执行这个检查, 一旦报错就不需要继续
+        enforce: 'pre',
+        test: /.(js|jsx)$/,
+        loader: 'eslint-loader',
+        exclude: [
+          path.resolve(__dirname, '../node_modules')
+        ]
+
+      },
       {
         test: /\.(jsx)$/,
         use: {
           loader: 'babel-loader',
           options: {
-            "presets": ["@babel/preset-react"]
+            'presets': ['@babel/preset-react']
           }
         }
       },
       {
         test: /\.(js)$/,
         use: {
-          loader: 'babel-loader',
+          loader: 'babel-loader'
         },
         exclude: [
           path.join(__dirname, '../node_modules')
@@ -55,10 +65,10 @@ const config  = {
   ]
 }
 
-//是开发环境的话增加配置
-if(isDev) {
-  //webpack的entry 可以是数组类型的，数组代表这个entry里面包含了的引用文件都会打包到同一个文件中
-  //react-hot-loader/patch 是客户端热更新代码使需要用到的内容，都封装在patch模块中
+// 是开发环境的话增加配置
+if (isDev) {
+  // webpack的entry 可以是数组类型的，数组代表这个entry里面包含了的引用文件都会打包到同一个文件中
+  // react-hot-loader/patch 是客户端热更新代码使需要用到的内容，都封装在patch模块中
   config.entry = {
     app: [
       // 'react-hot-loader/patch',  好像可以不加
@@ -67,28 +77,27 @@ if(isDev) {
     ]
   }
   config.devServer = {
-    //可以使用任何方式访问，指向本机ip
+    // 可以使用任何方式访问，指向本机ip
     host: '0.0.0.0',
-    //启动server 的端口
+    // 启动server 的端口
     port: '8888',
-    //output中编译文件的存储位置
+    // output中编译文件的存储位置
     contentBase: path.join(__dirname, '../dist'),
-    //启动 hot module replacement
+    // 启动 hot module replacement
     hot: true,
-    //webpack 编译过程中，出现任何错误，在网页上面显示黑色背景和错误信息，
+    // webpack 编译过程中，出现任何错误，在网页上面显示黑色背景和错误信息，
     // errors: true只显示错误信息， warning
     overlay: {
-      errors: true,
+      errors: true
     },
-    //访问所有静态路径都需要加/public 才能访问到生成的public静态文件
+    // 访问所有静态路径都需要加/public 才能访问到生成的public静态文件
     publicPath: '/public/',
-    //指定dist 下的 index.html,当请求url 为404时候，应该返回这个页面。
+    // 指定dist 下的 index.html,当请求url 为404时候，应该返回这个页面。
     historyApiFallback: {
       index: '/public/index.html'
     }
   }
-  //HotModuleReplacementPlugin 由于这个包时webpack里面的，记得要引用webpack
+  // HotModuleReplacementPlugin 由于这个包时webpack里面的，记得要引用webpack
   config.plugins.push(new webpack.HotModuleReplacementPlugin())
 }
-module.exports = config;
-
+module.exports = config
