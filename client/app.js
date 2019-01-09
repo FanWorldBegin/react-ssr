@@ -1,7 +1,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom';
-import App from './App.jsx';
+import App from './views/APP.js';
 //import App from './entry.js';
 
 ReactDOM.render(<App/>, document.getElementById('root'))
