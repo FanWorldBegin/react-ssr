@@ -1,4 +1,5 @@
 const express = require('express')
+const favicon = require('serve-favicon')
 
 const ReactSSR = require('react-dom/server')
 
@@ -10,6 +11,7 @@ const fs = require('fs')
 const path = require('path')
 
 const app = express()
+app.use(favicon(path.join(__dirname, '../favicon.ico')))
 
 app.listen(3333, function () {
   console.log('server is listening on 3333')

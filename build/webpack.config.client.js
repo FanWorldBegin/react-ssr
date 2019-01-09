@@ -2,68 +2,39 @@ const webpack = require('webpack')
 // 使用绝对路径path,避免系统差异
 const path = require('path')
 const HTMLPlugin = require('html-webpack-plugin')
+const webpackMerge = require('webpack-merge')
+const baseConfig = require('./webpack.base')
 // 判断当前环境， 在启动命令中手动输入，在启动webpack时候手动输入指令区分开发环境，线上环境
 const isDev = process.env.NODE_ENV == 'development'
-console.log(process.env.NODE_ENV)
-const config = {
-  mode: 'development',
-  // app.js为打包入口，形成依赖🌲
-  entry: {
-    app: path.join(__dirname, '../client/app.js')
-  },
-  // 打包后输出的地方
-  output: {
-    // [] 中括号是变量的意思，filename中的变量有
-    // name 代表 entry下面对应的一项的名字，这里为 app
-    // hash 在对整个app打包完成后，会根据内容生成hash值，只要内容不一样会变化
-    filename: '[name].[hash].js',
-    // path 输出文件存放路径, 根目录下 dist 文件夹
-    path: path.join(__dirname, '../dist'),
-    // 静态资源引用路径，publicPath为空时： 在html 中打包后生成的script 路径为 app.hash.js
-    // publicPath='/public  ---- /public/app.hash.js
-    // 帮我们区分url为静态资源还是url 请求，添加前缀
-    // 当静态资源要部署在CDN上面时候，将CDN的域名写入publicPath 即可
-    publicPath: '/public/'
-  },
-  // 配置loader
-  module: {
-    rules: [
-      {
-        // 在执行真正的loader代码编译之前，执行这个检查, 一旦报错就不需要继续
-        enforce: 'pre',
-        test: /.(js|jsx)$/,
-        loader: 'eslint-loader',
-        exclude: [
-          path.resolve(__dirname, '../node_modules')
-        ]
 
-      },
-      {
-        test: /\.(jsx)$/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            'presets': ['@babel/preset-react']
-          }
-        }
-      },
-      {
-        test: /\.(js)$/,
-        use: {
-          loader: 'babel-loader'
-        },
-        exclude: [
-          path.join(__dirname, '../node_modules')
-        ]
-      }
+console.log(process.env.NODE_ENV)
+
+const config = webpackMerge(baseConfig,
+  {
+    mode: 'development',
+    // app.js为打包入口，形成依赖🌲
+    entry: {
+      app: path.join(__dirname, '../client/app.js')
+    },
+    // 打包后输出的地方
+    output: {
+      // [] 中括号是变量的意思，filename中的变量有
+      // name 代表 entry下面对应的一项的名字，这里为 app
+      // hash 在对整个app打包完成后，会根据内容生成hash值，只要内容不一样会变化
+      filename: '[name].[hash].js'
+      // path 输出文件存放路径, 根目录下 dist 文件夹
+      // 静态资源引用路径，publicPath为空时： 在html 中打包后生成的script 路径为 app.hash.js
+      // publicPath='/public  ---- /public/app.hash.js
+      // 帮我们区分url为静态资源还是url 请求，添加前缀
+      // 当静态资源要部署在CDN上面时候，将CDN的域名写入publicPath 即可
+    },
+    plugins: [
+      new HTMLPlugin({
+        template: path.join(__dirname, '../client/template.html')
+      })
     ]
-  },
-  plugins: [
-    new HTMLPlugin({
-      template: path.join(__dirname, '../client/template.html')
-    })
-  ]
-}
+  }
+)
 
 // 是开发环境的话增加配置
 if (isDev) {
@@ -88,7 +59,7 @@ if (isDev) {
     // webpack 编译过程中，出现任何错误，在网页上面显示黑色背景和错误信息，
     // errors: true只显示错误信息， warning
     overlay: {
-      errors: true
+      errors: false
     },
     // 访问所有静态路径都需要加/public 才能访问到生成的public静态文件
     publicPath: '/public/',
