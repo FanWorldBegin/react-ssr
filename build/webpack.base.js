@@ -7,6 +7,10 @@ module.exports = {
     path: path.join(__dirname, '../dist'),
     publicPath: '/public/'
   },
+  // 不需要写后缀的文件类型
+  resolve: {
+    extensions: ['.js', '.jsx']
+  },
   // 配置loader
   module: {
     rules: [
